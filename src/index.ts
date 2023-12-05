@@ -4,36 +4,35 @@ import * as path from "path";
 import { Plugin } from "rollup";
 
 import { copyFiles, copyModules, unique } from "./copy-node";
-const jsxbin = require("jsxbin");
+
 
 import * as fs from "fs-extra";
 const prettifyXml = require("prettify-xml");
 
 // import { requirejs } from "./lib/require-js";
 
+import MagicString from "magic-string";
+import type { HtmlTagDescriptor, ResolvedConfig } from "vite";
+import { CEP_Config, CEP_Config_Extended, JSXBIN_MODE } from "./cep-config";
 import {
-  log,
   conColors,
-  posix,
-  resetLog,
   fixAssetPathCSS,
-  fixAssetPathJS,
   fixAssetPathHTML,
+  fixAssetPathJS,
+  log,
+  posix,
   removeModuleTags,
+  resetLog,
 } from "./lib/lib";
+import { nodeBuiltIns } from "./lib/node-built-ins";
+import { packageSync } from "./lib/package-sync";
+import { metaPackage } from "./lib/zip";
 import { signZXP } from "./lib/zxp";
-import { manifestTemplate } from "./templates/manifest-template";
 import { debugTemplate } from "./templates/debug-template";
 import { devHtmlTemplate } from "./templates/dev-html-template";
-import type { HtmlTagDescriptor, ResolvedConfig } from "vite";
-import { menuHtmlTemplate } from "./templates/menu-html-template";
-import { CEP_Config, CEP_Config_Extended, JSXBIN_MODE } from "./cep-config";
+import { manifestTemplate } from "./templates/manifest-template";
 // export { CEP_Config } from "./cep-config";
 export type { CEP_Config };
-import { nodeBuiltIns } from "./lib/node-built-ins";
-import MagicString from "magic-string";
-import { metaPackage } from "./lib/zip";
-import { packageSync } from "./lib/package-sync";
 
 const homedir = os.homedir();
 const tmpDir = path.join(__dirname, ".tmp");
@@ -657,6 +656,7 @@ export const jsxBin = (jsxBinMode?: JSXBIN_MODE) => {
           const tmpSrc = fs.writeFileSync(srcFilePathTmp, bundle[esFile].code, {
             encoding: "utf-8",
           });
+          const jsxbin = require("jsxbin");
           await jsxbin(srcFilePathTmp, dstFilePathTmp);
           const output = fs.readFileSync(dstFilePathTmp, { encoding: "utf-8" });
           const jsxBinFile = {
